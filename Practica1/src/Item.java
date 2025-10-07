@@ -5,13 +5,15 @@ public class Item implements Serializable {
     private final String tipo; // categoría o tipo
     private final String nombre;
     private final double precio;
+    private final String marca;
     private int existencia;
 
-    public Item(int id, String tipo, String nombre, double precio, int existencia) {
+    public Item(int id, String tipo, String nombre, double precio, String marca, int existencia) {
         this.id = id;
         this.tipo = tipo;
         this.nombre = nombre;
         this.precio = precio;
+        this.marca = marca;
         this.existencia = existencia;
     }
 
@@ -19,6 +21,7 @@ public class Item implements Serializable {
     public String getTipo() { return tipo; }
     public String getNombre() { return nombre; }
     public double getPrecio() { return precio; }
+    public String getMarca() { return marca; }
 
     public synchronized int getExistencia() { return existencia; }
 
@@ -37,6 +40,6 @@ public class Item implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("ID:%d | %s - %s | $%.2f | stock:%d", id, tipo, nombre, precio, existencia);
+        return String.format("ID:%d | %s | %s | %s | $%.2f | stock:%d", id, nombre, marca, tipo, precio, existencia);
     }
 }

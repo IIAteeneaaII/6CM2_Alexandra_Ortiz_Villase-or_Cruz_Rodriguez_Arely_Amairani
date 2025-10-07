@@ -10,6 +10,7 @@ public class ClientCLI {
     private final Cart cart = new Cart();
     private final Scanner sc = new Scanner(System.in);
 
+    //Constructor de la clase Client
     public ClientCLI(String host, int port) {
         this.host = host;
         this.port = port;
@@ -37,6 +38,12 @@ public class ClientCLI {
                         printResponse(serverIn);
                         break;
                     case "3":
+                        System.out.print("Busqueda: ");
+                        String query = sc.nextLine().trim();
+                        serverOut.println("SEARCH " + query);
+                        printResponse(serverIn);
+                    break;
+                    case "4":
                         System.out.print("ID a agregar: ");
                         int id = Integer.parseInt(sc.nextLine().trim());
                         System.out.print("Cantidad: ");
@@ -56,10 +63,10 @@ public class ClientCLI {
                             System.out.println("Error al checar item: " + check);
                         }
                         break;
-                    case "4":
+                    case "5":
                         editCart();
                         break;
-                    case "5":
+                    case "6":
                         if (cart.isEmpty()) {
                             System.out.println("Carrito vacío.");
                             break;
@@ -72,8 +79,8 @@ public class ClientCLI {
                         serverOut.println("FINALIZAR " + user + " " + items);
                         printResponse(serverIn);
                         // si OK -> vaciar carrito localmente (asumido comprado)
-                        String last = serverIn.readLine(); // already read in printResponse? careful
-                        // NOTE: printResponse reads one line and prints additional lines only if OK\ntext
+                        // String last = serverIn.readLine(); // already read in printResponse? careful <- sí ya se lee en printResponse
+                        // NOTE: printResponse reads one line and prints additional lines only if OK\ntext 
                         // To keep simple, re-request final response:
                         // Actually modify printResponse to return the full response. For brevity, assume server sent full.
                         cart.getItems().clear();
@@ -118,11 +125,12 @@ public class ClientCLI {
         System.out.println("\n--- MENU ---");
         System.out.println("1) Mostrar todos los artículos");
         System.out.println("2) Buscar por tipo");
-        System.out.println("3) Agregar al carrito (valida stock antes)");
-        System.out.println("4) Editar carrito");
-        System.out.println("5) Finalizar compra y obtener ticket");
+        System.out.println("3) Buscar por marca o nombre");
+        System.out.println("4) Agregar al carrito (valida stock antes)");
+        System.out.println("5) Editar carrito");
+        System.out.println("6) Finalizar compra y obtener ticket");
         System.out.println("0) Salir");
-        System.out.print("Opción: ");
+        System.out.print("Opcion: ");
     }
 
     private void printResponse(BufferedReader serverIn) throws IOException {
