@@ -63,8 +63,8 @@ public class Client {
             saveToFile(receivedData, outputFile);
             System.out.println("✅ Archivo reconstruido: " + outputFile);
 
-            // 🔊 Reproducir MP3 recibido (opcional)
-            playAudio(outputFile);
+             // 🔊 Reproducir MP3 con opción de pausar y reanudar
+            playAudioWithConsoleControl(outputFile);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,13 +92,66 @@ public class Client {
         }
     }
 
-    // 🔊 Reproduce el archivo MP3 usando JLayer
-    private static void playAudio(String filePath) {
-        try (FileInputStream fis = new FileInputStream(filePath)) {
-            System.out.println("🎶 Reproduciendo archivo con JLayer...");
-            Player player = new Player(fis);
-            player.play();
-            System.out.println("✅ Reproducción finalizada.");
+    // 🔊 Reproduce el archivo con controles desde consola
+    private static void playAudioWithConsoleControl(String filePath) {
+        try {
+            File file = new File(filePath);
+            long pausePosition = 0;
+            boolean playing = true;
+            Scanner scanner = new Scanner(System.in);
+
+            while (true) {
+                if (playing) {
+                    FileInputStream fis = new FileInputStream(file);
+                    if (pausePosition > 0) fis.skip(pausePosition); // reanudar desde posición
+
+                    Player player = new Player(fis);
+
+                    Thread playThread = new Thread(() -> {
+                        try {
+                            player.play();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    playThread.start();
+
+                    System.out.println("🎶 Reproduciendo. Escribe 'pause', 'resume' o 'exit':");
+
+                    while (playThread.isAlive()) {
+                        if (scanner.hasNextLine()) {
+                            String command = scanner.nextLine().trim().toLowerCase();
+                            if (command.equals("pause")) {
+                                System.out.println("⏸️ Pausando reproducción...");
+                                pausePosition = fis.getChannel().position(); // guardar posición actual
+                                player.close();
+                                playThread.join(); // esperar que el hilo termine
+                                playing = false;
+                                break;
+                            } else if (command.equals("exit")) {
+                                System.out.println("👋 Saliendo del reproductor...");
+                                player.close();
+                                return;
+                            }
+                        }
+                    }
+
+                    if (!playThread.isAlive() && playing) {
+                        System.out.println("✅ Reproducción finalizada.");
+                        break;
+                    }
+
+                } else {
+                    System.out.println("▶️ Escribe 'resume' para continuar o 'exit' para salir:");
+                    String command = scanner.nextLine().trim().toLowerCase();
+                    if (command.equals("resume")) {
+                        playing = true;
+                    } else if (command.equals("exit")) {
+                        System.out.println("👋 Saliendo del reproductor...");
+                        break;
+                    }
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
