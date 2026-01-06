@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Politécnica</title>
+    <style>
+        /* ================== LADRILLOS =================== */
+@font-face {
+  font-family: 'Colegio';
+  src: url('Volters.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+    font-family: 'colegio';
+    src: url('varsity.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+:root{
+    --brick-color: #ffffff; /* color base */
+    --hover-color: #741E41; /* color guinda */
+    --brick-width: 60px; /* ancho ladrillo */
+    --brick-height: 30px; /* alto ladrillo*/
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.contenido-superior {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  padding: 0 5%;
+  pointer-events: none;
+}
+
+.escudoIPN{
+    position: relative;
+    width: 25%; /* Responsivo: ocupa 25% del ancho */
+    max-width: 150px;
+    height: auto;
+}
+
+.texto-bienvenida {
+  width: 100%; /* Responsivo: ocupa 65% del ancho */
+  text-align: left;
+  color: #741E41;
+  text-align: center;
+  font-family: 'colegio', sans-serif;
+}
+
+.titulo {
+  font-size: 5vw;
+  margin-bottom: 10px;
+}
+
+.bienvenida {
+  font-size: 2vw;
+  color: black;
+}
+
+.brick-section{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 300px; /* puedes ajustar la altura */
+    overflow: hidden;
+    position: relative;
+}
+
+.brick-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    z-index: 0;
+}
+
+.brick-row {
+    display: flex;
+}
+
+.brick-row.offset {
+    margin-left: calc(var(--brick-width) / 2);
+}
+
+.brick {
+    width: var(--brick-width);
+    height: var(--brick-height);
+    background-color: var(--brick-color);
+    border: 1px solid #C8C8BC;
+    transition: background-color 0.2s ease, border 0.2s ease;
+}
+
+.brick.painted {
+  background-color: var(--hover-color);
+  border: none;
+  transition: background-color 0.5s ease;
+}
+
+.brick:hover {
+    background-color: var(--hover-color);
+    border: none;
+}
+
+/* ======================== CURSOR ======================== */
+
+.animation-cursor{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    height: 100px;
+    background-color: #741E41;
+
+    color:#ffffff;
+    cursor: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.animation-cursor .cursor{
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+    background-color: white;
+    width: 25px;
+    height: 25px;
+    transition: all 0.2s ease;
+    z-index: 1;
+}
+
+
+.animation-cursor .cursor.hover {
+  background-color: white;
+  width: 80px;
+  height: 80px;
+}
+
+/* .title{
+    font-family: 'colegio';
+} */
+
+.title span {
+  position: relative;
+  z-index: 2; /* Texto encima */
+  display: inline-block;
+  transition: color 0.2s ease;
+}
+
+.title span.hovered {
+  color: #741E41;
+}
+
+    </style>
+</head>
+<body>
+    <header class="brick-section">        
+        <div class="brick-layer" id="brickLayer"></div>
+        <div class="contenido-superior">
+            <img src="ipnEscudo.png" class="escudoIPN" alt="Escudo IPN">
+            <div class="texto-bienvenida">
+                <h1 class="titulo">guía politécnica</h1>
+                <h1 class="bienvenida">¡bienvenido aspirante!</h1>
+            </div>            
+        </div>        
+    </header>
+
+    <br><br>
+
+    <footer class = "animation-cursor">
+        <h1 class="title">Guía Politécnica</h1>
+    </footer>
+
+    <script>
+/* ====================== ANIMACIÓN LADRILLOS ======================*/
+   const layer = document.getElementById('brickLayer');
+
+    function generateBricks() {
+      layer.innerHTML = '';
+      const brickWidth = 60;
+      const brickHeight = 30;
+
+      const layerWidth = layer.offsetWidth;
+      const layerHeight = layer.offsetHeight;
+
+      const cols = Math.floor(layerWidth / brickWidth);
+      const rows = Math.floor(layerHeight / brickHeight);
+
+      for (let r = 0; r < rows; r++) {
+        const row = document.createElement('div');
+        row.className = 'brick-row' + (r % 2 ? ' offset' : '');
+
+        for (let c = 0; c < cols; c++) {
+          const brick = document.createElement('div');
+          brick.className = 'brick';
+          row.appendChild(brick);
+        }
+        layer.appendChild(row);
+      }
+    }
+
+    layer.addEventListener('mousemove', (e) => {
+    const bricks = layer.querySelectorAll('.brick');
+    const escudo = document.querySelector('.escudoIPN');
+    /* const texto = document.querySelector('.bienvenida'); */
+    
+
+    const escudoRect = escudo.getBoundingClientRect();
+    /* const textoRect = texto.getBoundingClientRect(); */
+
+    bricks.forEach(brick => {
+        const rect = brick.getBoundingClientRect();
+        const x = e.clientX;
+        const y = e.clientY;
+
+        const isHovering = (
+        x >= rect.left &&
+        x <= rect.right &&
+        y >= rect.top &&
+        y <= rect.bottom
+        );
+
+        const isBehindEscudo = (
+            rect.right > escudoRect.left &&
+            rect.left < escudoRect.right &&
+            rect.bottom > escudoRect.top &&
+            rect.top < escudoRect.bottom
+        );
+
+        /* const isBehindTexto = (
+            rect.right > textoRect.left &&
+            rect.left < textoRect.right &&
+            rect.bottom > textoRect.top &&
+            rect.top < textoRect.bottom
+        ); */
+
+         if (isHovering && !isBehindEscudo/*  && !isBehindTexto */) {
+            brick.classList.add('painted');
+            setTimeout(() => {
+                brick.classList.remove('painted');
+            }, 600);
+        }
+    });
+    });
+
+
+    generateBricks();
+    window.addEventListener('resize', generateBricks);
+
+/* ====================== circulo lupa ====================== */
+document.addEventListener("DOMContentLoaded", () => {
+  const section = document.querySelector('.animation-cursor');
+  const title = section.querySelector('.title');
+
+  // Crear cursor personalizado
+  const cursor = document.createElement('div');
+  cursor.classList.add('cursor');
+  section.appendChild(cursor);
+
+  // Dividir el texto del h1 en letras individuales
+  const letters = title.textContent.split('');
+  title.textContent = '';
+  letters.forEach(char => {
+    const span = document.createElement('span');
+    span.textContent = char;
+    title.appendChild(span);
+  });
+
+  const spans = title.querySelectorAll('span');
+
+  section.addEventListener('mousemove', (e) => {
+    const rect = section.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Mover el cursor
+    cursor.style.left = `${x - cursor.offsetWidth / 2}px`;
+    cursor.style.top = `${y - cursor.offsetHeight / 2}px`;
+
+    let hoveringLetter = false;
+
+    spans.forEach(span => {
+      const spanRect = span.getBoundingClientRect();
+      const spanX = spanRect.left + spanRect.width / 2;
+      const spanY = spanRect.top + spanRect.height / 2;
+      const distance = Math.hypot(e.clientX - spanX, e.clientY - spanY);
+
+      if (distance < 40) {
+        span.classList.add('hovered');
+        hoveringLetter = true;
+      } else {
+        span.classList.remove('hovered');
+      }
+    });
+
+    // Cambiar tamaño/color del cursor si está sobre alguna letra
+    if (hoveringLetter) {
+      cursor.classList.add('hover');
+    } else {
+      cursor.classList.remove('hover');
+    }
+  });
+
+  section.addEventListener('mouseleave', () => {
+    cursor.classList.remove('hover');
+    spans.forEach(span => span.classList.remove('hovered'));
+  });
+});
+    </script>
+</body>
+</html>
